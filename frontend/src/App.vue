@@ -52,14 +52,16 @@
     <div class="flex-1 flex flex-col gap-3 p-4 overflow-y-auto">
       <!-- Register Gauges -->
       <div class="grid grid-cols-4 gap-3">
-        <div v-for="d in store.devices" :key="d.id" v-for="r in d.registers" :k="r.address"
-          class="bg-gray-900 rounded-xl p-3">
-          <div class="text-xs text-gray-400">{{ d.name }}</div>
-          <div class="text-2xl font-bold" :class="d.online ? 'text-orange-400' : 'text-gray-600'">
-            {{ typeof r.value === 'number' ? r.value.toFixed(r.value > 100 ? 0 : 1) : r.value ? 'ON' : 'OFF' }}
+        <template v-for="d in store.devices" :key="d.id">
+          <div v-for="r in d.registers" :key="`${d.id}_${r.address}`"
+            class="bg-gray-900 rounded-xl p-3">
+            <div class="text-xs text-gray-400">{{ d.name }}</div>
+            <div class="text-2xl font-bold" :class="d.online ? 'text-orange-400' : 'text-gray-600'">
+              {{ typeof r.value === 'number' ? r.value.toFixed(r.value > 100 ? 0 : 1) : r.value ? 'ON' : 'OFF' }}
+            </div>
+            <div class="text-xs text-gray-500">{{ r.name }} {{ r.unit }}</div>
           </div>
-          <div class="text-xs text-gray-500">{{ r.name }} {{ r.unit }}</div>
-        </div>
+        </template>
       </div>
 
       <!-- Chart -->

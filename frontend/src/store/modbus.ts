@@ -104,7 +104,10 @@ export const useModbusStore = defineStore('modbus', () => {
       for (const reg of dev.registers) {
         if (typeof reg.value === 'number') {
           const oldValue = reg.value
-          const noise = (Math.random() - 0.5) * reg.value * 0.02
+          let noise = (Math.random() - 0.5) * reg.value * 0.02
+          if (Math.random() < 0.05) {
+            noise += (Math.random() > 0.5 ? 1 : -1) * reg.value * (0.2 + Math.random() * 0.3)
+          }
           reg.value = Math.round((reg.value + noise) * 100) / 100
           reg.updatedAt = Date.now()
           const key = `${dev.id}_${reg.address}`
