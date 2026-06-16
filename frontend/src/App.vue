@@ -34,6 +34,15 @@
         </div>
       </div>
 
+      <div v-if="store.unacknowledgedAnomalies.length" class="bg-orange-900/40 rounded p-2 mt-2">
+        <h4 class="text-orange-400 text-xs font-bold">⚡ 异常波动 {{ store.unacknowledgedAnomalies.length }}</h4>
+        <div class="mt-1">
+          <div v-for="d in store.affectedDevices" :key="d.id" class="text-xs text-orange-300 truncate">
+            {{ d.name }}
+          </div>
+        </div>
+      </div>
+
       <div class="text-xs text-gray-600 mt-auto">
         在线: {{ store.onlineDevices.length }}/{{ store.devices.length }}
       </div>
@@ -59,6 +68,45 @@
           实时趋势 — {{ store.selectedDevice?.name || '选择设备' }}
         </h3>
         <TrendChart />
+      </div>
+
+      <!-- Anomaly Fluctuation Panel -->
+      <div v-if="store.anomalyFluctuations.length" class="bg-gray-900 rounded-xl p-3 max-h-64 overflow-y-auto">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-sm text-gray-400">
+            异常波动标记
+            <span class="ml-2 text-xs px-1.5 py-0.5 rounded" :class="store.unacknowledgedAnomalies.length ? 'bg-orange-700 text-orange-200' : 'bg-gray-700 text-gray-400'">
+              {{ store.unacknowledgedAnomalies.length }} 未确认
+            </span>
+          </h3>
+          <div v-if="store.affectedDevices.length" class="text-xs text-gray-500">
+            影响设备: {{ store.affectedDevices.map(d => d.name).join('、') }}
+          </div>
+        </div>
+        <div v-for="a in store.anomalyFluctuations.slice(0, 15)" :key="a.id"
+          class="flex items-center gap-2 text-xs bg-gray-800 rounded p-2 mb-1"
+          :class="{ 'opacity-50': a.acknowledged }">
+          <span class="w-5 h-5 flex items-center justify-center rounded"
+            :class="a.direction === 'spike' ? 'bg-red-900/60 text-red-400' : 'bg-blue-900/60 text-blue-400'">
+            {{ a.direction === 'spike' ? '▲' : '▼' }}
+          </span>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-1">
+              <span class="text-gray-300 truncate">{{ a.deviceName }}</span>
+              <span class="text-gray-500">·</span>
+              <span class="truncate" :class="a.direction === 'spike' ? 'text-red-400' : 'text-blue-400'">{{ a.register }}</span>
+            </div>
+            <div class="text-gray-500 mt-0.5">
+              {{ a.valueBefore }} → {{ a.valueAfter }} {{ a.unit }}
+              <span class="ml-1" :class="a.direction === 'spike' ? 'text-red-400' : 'text-blue-400'">
+                ({{ a.direction === 'spike' ? '+' : '' }}{{ a.changeRate }}%)
+              </span>
+            </div>
+          </div>
+          <span class="text-gray-600 shrink-0">{{ new Date(a.timestamp).toLocaleTimeString() }}</span>
+          <button v-if="!a.acknowledged" @click="store.acknowledgeAnomaly(a.id)"
+            class="text-blue-400 hover:underline shrink-0">确认</button>
+        </div>
       </div>
 
       <!-- Alarm List -->

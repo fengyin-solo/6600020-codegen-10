@@ -26,3 +26,17 @@ export interface Alarm {
   timestamp: number
   acknowledged: boolean
 }
+
+export interface AnomalyFluctuation {
+  id: string
+  deviceId: string
+  deviceName: string
+  register: string
+  direction: 'spike' | 'drop'
+  changeRate: number
+  valueBefore: number
+  valueAfter: number
+  unit: string
+  timestamp: number
+  acknowledged: boolean
+}
